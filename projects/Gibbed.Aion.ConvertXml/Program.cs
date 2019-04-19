@@ -1,58 +1,115 @@
-﻿using System;
+﻿/* Copyright (c) 2019 Rick (rick 'at' gibbed 'dot' us)
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ *
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ *
+ * 1. The origin of this software must not be misrepresented; you must not
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would
+ *    be appreciated but is not required.
+ *
+ * 2. Altered source versions must be plainly marked as such, and must not
+ *    be misrepresented as being the original software.
+ *
+ * 3. This notice may not be removed or altered from any source
+ *    distribution.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Windows.Forms;
 using System.Xml;
 using Gibbed.Aion.FileFormats;
+using NDesk.Options;
 
 namespace Gibbed.Aion.ConvertXml
 {
-	class Program
-	{
-		private static void WriteNode(XmlWriter writer, BinaryXmlNode node)
-		{
-			writer.WriteStartElement(node.Name);
+    internal class Program
+    {
+        private static string GetExecutableName()
+        {
+            return Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        }
 
-			foreach (KeyValuePair<string, string> attribute in node.Attributes)
-			{
-				writer.WriteAttributeString(attribute.Key, attribute.Value);
-			}
+        public static void Main(string[] args)
+        {
+            bool showHelp = false;
 
-			foreach (BinaryXmlNode child in node.Children)
-			{
-				WriteNode(writer, child);
-			}
+            var options = new OptionSet()
+            {
+                { "h|help", "show this message and exit", v => showHelp = v != null },
+            };
 
-			if (node.Value != null)
-			{
-				writer.WriteValue(node.Value);
-			}
+            List<string> extras;
 
-			writer.WriteEndElement();
-		}
+            try
+            {
+                extras = options.Parse(args);
+            }
+            catch (OptionException e)
+            {
+                Console.Write("{0}: ", GetExecutableName());
+                Console.WriteLine(e.Message);
+                Console.WriteLine("Try `{0} --help' for more information.", GetExecutableName());
+                return;
+            }
 
-		public static void Main(string[] args)
-		{
-			if (args.Length != 2)
-			{
-				Console.WriteLine("{0} [input_binary.xml] [output.xml]", Path.GetFileName(Application.ExecutablePath));
-				return;
-			}
+            if (extras.Count < 1 || extras.Count > 2 || showHelp == true)
+            {
+                Console.WriteLine("Usage: {0} [OPTIONS]+ input_binary [output_xml]", GetExecutableName());
+                Console.WriteLine();
+                Console.WriteLine("Options:");
+                options.WriteOptionDescriptions(Console.Out);
+                return;
+            }
 
-			Stream input = File.OpenRead(args[0]);
-			BinaryXmlFile bx = new BinaryXmlFile();
-			bx.Read(input);
-			input.Close();
+            var inputPath = Path.GetFullPath(extras[0]);
+            var outputPath = extras.Count > 1 ? extras[1] : Path.ChangeExtension(inputPath, null) + "_converted.xml";
 
-			XmlTextWriter writer = new XmlTextWriter(args[1], Encoding.Unicode);
-			writer.Formatting = Formatting.Indented;
+            BinaryXmlFile binaryXml;
+            using (var input = File.OpenRead(inputPath))
+            {
+                binaryXml = new BinaryXmlFile();
+                binaryXml.Read(input);
+            }
 
-			writer.WriteStartDocument();
-			WriteNode(writer, bx.Root);
-			writer.WriteEndDocument();
-			writer.Flush();
-			writer.Close();
-		}
-	}
+            using (var output = File.Create(outputPath))
+            using (var writer = new XmlTextWriter(output, Encoding.UTF8))
+            {
+                writer.Formatting = Formatting.Indented;
+                writer.WriteStartDocument();
+                WriteNode(writer, binaryXml.Root);
+                writer.WriteEndDocument();
+                writer.Flush();
+            }
+        }
+
+        private static void WriteNode(XmlWriter writer, BinaryXmlNode node)
+        {
+            writer.WriteStartElement(node.Name);
+
+            foreach (var attribute in node.Attributes)
+            {
+                writer.WriteAttributeString(attribute.Key, attribute.Value);
+            }
+
+            foreach (var child in node.Children)
+            {
+                WriteNode(writer, child);
+            }
+
+            if (node.Value != null)
+            {
+                writer.WriteValue(node.Value);
+            }
+
+            writer.WriteEndElement();
+        }
+    }
 }
