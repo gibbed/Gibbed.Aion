@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Aion.ConvertXml", "Gibbed.Aion.ConvertXml\Gibbed.Aion.ConvertXml.csproj", "{27933863-B03E-450B-AFD0-43DFF723079E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Aion.ConvertXml", "projects\Gibbed.Aion.ConvertXml\Gibbed.Aion.ConvertXml.csproj", "{27933863-B03E-450B-AFD0-43DFF723079E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Helpers", "Gibbed.Helpers\Gibbed.Helpers.csproj", "{5162A9FB-4DE1-4BBF-B7A2-5E8116AB0D26}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Helpers", "projects\Gibbed.Helpers\Gibbed.Helpers.csproj", "{5162A9FB-4DE1-4BBF-B7A2-5E8116AB0D26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Aion.FileFormats", "Gibbed.Aion.FileFormats\Gibbed.Aion.FileFormats.csproj", "{73BE0945-5719-4189-95F5-56A1BB970554}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Aion.FileFormats", "projects\Gibbed.Aion.FileFormats\Gibbed.Aion.FileFormats.csproj", "{73BE0945-5719-4189-95F5-56A1BB970554}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
